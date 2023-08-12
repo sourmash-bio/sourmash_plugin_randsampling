@@ -1,73 +1,63 @@
-# sourmash_plugin_xyz: a template for sourmash plugins
+# sourmash_plugin_RandSampling
 
-This is a good place to start if you're writing a plugin for
-[sourmash (sourmash-bio/sourmash/)](https://github.com/sourmash-bio/sourmash/).
 
-Note: plugins are not yet available in a released version of sourmash.
+The RandSampling plugin performs weighted-random-sampling to extract a max number of k-mers from a signature using their abundance distribution.
 
-## Instructions
+ The main aim is to extract k-mers from large signatures with different coverages (abundances) to create a smaller signature with a more uniform coverage distribution.
 
-You can use this repo as a template repo to create a new plugin!
+The `--force` option allows you to force the extraction of a signature in case it's empty or has fewer than `max_kmers`. This is useful in workflows (e.g. snakemake).
 
-See [this set of changes](https://github.com/ctb/sourmash_plugin_template_test1/pull/1) for the minimal diff needed to get a plugin working!
+The `--plot` option allows you to plot the abundance distribution of the input and output signatures.
 
-### Building from a template:
 
-First, go to [the GitHub page](https://github.com/sourmash-bio/sourmash_plugin_template) and click "Use this template" to create a new repository.
+![alt text](assets/image.png)
+The figure illustrates the relationship between abundance (x-axis) and frequency (y-axis) in the context of k-mer extraction. In the plot, the median abundance frequency is indicated by a horizontal line, and the selected abundances are represented by individual dots. Specifically, this visualization reflects the process of extracting 100,000 k-mers from a pool of approximately 500,000 k-mers, highlighting the weighted-random-sampling technique used to create a more uniform distribution.
 
-Clone that repository into your development space.
 
-Then, search for all places where 'xyz' is present, and replace
-'xyz' with the name of your plugin.
-
-Next, edit the code in `src/sourmash_plugin_xyz.py` to implement the plugin
-(you'll probably want to change the name of that file, too.)
-
-Then run `pip install .` to install and test your plugin! You can also
-run `pip install -e .` to install it in editable mode, which is more
-convenient for development.
-
-## Examples
-
-[sourmash_plugin_avro](https://github.com/sourmash-bio/sourmash_plugin_avro)
-and
-[sourmash_plugin_load_urls](https://github.com/sourmash-bio/sourmash_plugin_load_urls)
-are two examples you can follow.
-
-## Template docs for new plugin built from this template.
-
-Delete everything from this line on up and put in your new README ;).
-
-# sourmash_plugin_xyz
 
 ## Installation
 
+Make sure you have an updated pip version:
+
+```bash
+# update pip
+pip install --upgrade pip
+
+# or 
+conda update pip
 ```
-pip install sourmash_plugin_xyz
+
+Then install the plugin:
+
+
+```
+pip install git+https://github.com/sourmash-bio/sourmash_plugin_randsampling.git
 ```
 
 ## Usage
 
-non-xyz info goes here!
-
-## Support
-
-We suggest filing issues in [the main sourmash issue tracker](https://github.com/dib-lab/sourmash/issues) as that receives more attention!
-
-## Dev docs
-
-`xyz` is developed at https://github.com/sourmash-bio/sourmash_plugin_template.
-
-### Generating a release
-
-Bump version number in `pyproject.toml` and push.
-
-Make a new release on github.
-
-Then pull, and:
-
-```
-python -m build
+```bash
+sourmash scripts randsampling --help
 ```
 
-followed by `twine upload dist/...`.
+```bash
+usage:  randsampling [-h] [-q] [-d] --sig SIG -m MAX_KMERS -k K -o OUT [--plot] [--force]
+
+options:
+  -h, --help            show this help message and exit
+  -q, --quiet           suppress non-error output
+  -d, --debug           provide debugging output
+  --sig SIG             path to signature file
+  -m MAX_KMERS, --max-kmers MAX_KMERS
+                        maximum number of kmers to extract
+  -k K                  kmer size
+  -o OUT, --out OUT     path to output signature file
+  --plot                plot abundance distribution
+  --force               force write new signature if empty or <max_kmers
+```
+
+## Example
+    
+```bash
+sourmash scripts randsampling  -k 51 --sig large.sig --max-kmers 1000 --plot --force -o subsampled.sig
+```

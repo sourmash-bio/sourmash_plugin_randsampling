@@ -1,3 +1,4 @@
+import contextlib
 "Various utilities used by sourmash tests."
 import sys
 import os
@@ -40,24 +41,18 @@ def scriptpath(scriptname='sourmash'):
 
 def _runscript(scriptname):
     """Find & run a script with exec (i.e. not via os.system or subprocess)."""
-    namespace = {"__name__": "__main__"}
-    namespace['sys'] = globals()['sys']
-
-    try:
+    namespace = {"__name__": "__main__", 'sys': globals()['sys']}
+    with contextlib.suppress(pkg_resources.ResolutionError):
         pkg_resources.load_entry_point("sourmash", 'console_scripts', scriptname)()
         return 0
-    except pkg_resources.ResolutionError:
-        pass
-
     path = scriptpath()
 
     scriptfile = os.path.join(path, scriptname)
-    if os.path.isfile(scriptfile):
-        if os.path.isfile(scriptfile):
-            exec(  # pylint: disable=exec-used
-                compile(open(scriptfile).read(), scriptfile, 'exec'),
-                namespace)
-            return 0
+    if os.path.isfile(scriptfile) and os.path.isfile(scriptfile):
+        exec(  # pylint: disable=exec-used
+            compile(open(scriptfile).read(), scriptfile, 'exec'),
+            namespace)
+        return 0
 
     return -1
 
@@ -107,7 +102,7 @@ def runscript(scriptname, args, **kwargs):
             status = err.code
             if status == None:
                 status = 0
-        except:  # pylint: disable=bare-except
+        except Exception:
             traceback.print_exc(file=sys.stderr)
             status = -1
     finally:
