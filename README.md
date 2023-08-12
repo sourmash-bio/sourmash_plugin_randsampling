@@ -3,11 +3,7 @@
 
 The RandSampling plugin performs weighted-random-sampling to extract a max number of k-mers from a signature using their abundance distribution.
 
- The main aim is to extract k-mers from large signatures with different coverages (abundances) to create a smaller signature with a more uniform coverage distribution.
-
-The `--force` option allows you to force the extraction of a signature in case it's empty or has fewer than `max_kmers`. This is useful in workflows (e.g. snakemake).
-
-The `--plot` option allows you to plot the abundance distribution of the input and output signatures.
+The main aim is to extract k-mers from large signatures with different coverages (abundances) to create a smaller signature with a more uniform coverage distribution.
 
 
 ![alt text](assets/image.png)
@@ -56,8 +52,17 @@ options:
   --force               force write new signature if empty or <max_kmers
 ```
 
+The `--force` option allows you to force the extraction of a signature in case it's empty or has fewer than `max_kmers`. This is useful in workflows (e.g. snakemake).
+
+The `--plot` option allows you to plot the abundance distribution of the input and output signatures.
+
+
 ## Example
     
 ```bash
 sourmash scripts randsampling  -k 51 --sig large.sig --max-kmers 1000 --plot --force -o subsampled.sig
 ```
+
+
+### Motivation
+In sourmash, the concurrent use of the scale and num parameters is not supported, and utilizing the num parameter is generally discouraged. This restriction has posed challenges in effectively obtaining a well-distributed, user-defined number of k-mers that would represent the original signature to a satisfactory degree.
